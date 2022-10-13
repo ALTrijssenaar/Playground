@@ -1,0 +1,36 @@
+name: Main
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  Build:
+    uses: ./.github/workflows/job-Build-Infra.yml
+
+  Deploy_DEV:
+    name: Deploy DEV
+    needs: Build
+    uses: ./.github/workflows/job-Deploy-Infra.yml
+    with:
+      environment: "DEV"
+    secrets: inherit
+
+  Deploy_PRD:
+    name: Deploy PRD
+    needs: Deploy_DEV
+    uses: ./.github/workflows/job-Deploy-Infra.yml
+    with:
+      environment: "PRD"
+    secrets: inherit

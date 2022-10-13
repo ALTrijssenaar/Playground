@@ -1,0 +1,15 @@
+name: Build-Infra
+
+on:
+  workflow_call:
+
+jobs:
+  Infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Upload Infra
+        uses: actions/upload-artifact@v3
+        with:
+          name: bicep
+          path: infra/bicep/

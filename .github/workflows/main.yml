@@ -27,10 +27,10 @@ jobs:
       environment: "DEV"
     secrets: inherit
 
-  Deploy_PRD:
-    name: Deploy PRD
-    needs: Deploy_DEV
-    uses: ./.github/workflows/job-Deploy-Infra.yml
-    with:
-      environment: "PRD"
-    secrets: inherit
+  # Deploy_PRD:
+  #   name: Deploy PRD
+  #   needs: Deploy_DEV
+  #   uses: ./.github/workflows/job-Deploy-Infra.yml
+  #   with:
+  #     environment: "PRD"
+  #   secrets: inherit

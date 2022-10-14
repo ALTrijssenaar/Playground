@@ -14,6 +14,9 @@ on:
       AZURE_SUBSCRIPTION_ID:
         required: true
 
+env:
+  RESOURCE_GROUP_NAME: ${{ inputs.environment }}-AKS
+
 jobs:
   Infra:
     runs-on: ubuntu-latest
@@ -29,13 +32,23 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy ${{ inputs.environment }} Infra
+      - name: Ensure ${{ env.RESOURCE_GROUP_NAME }}
         uses: azure/arm-deploy@v1
         with:
           scope: subscription
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          deploymentName: ensure_${{ env.RESOURCE_GROUP_NAME }}
+          region: "westeurope"
+          template: artifacts/bicep/resourceGroup.bicep
+          parameters: "location=westeurope resourceGroupName=${{ env.RESOURCE_GROUP_NAME }}"
+
+      - name: Deploy ${{ env.RESOURCE_GROUP_NAME }}
+        uses: azure/arm-deploy@v1
+        with:
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resourceGroupName: ${{ env.RESOURCE_GROUP_NAME }}
           deploymentMode: Complete
-          deploymentName: Deploy_${{ inputs.environment }}_Infra
+          deploymentName: deploy_${{ env.RESOURCE_GROUP_NAME }}
           region: "westeurope"
           template: artifacts/bicep/main.bicep
-          parameters: "location=westeurope resourcePrefix=${{ inputs.environment }}-AKS"
+          parameters: "location=westeurope resourceGroupName=${{ env.RESOURCE_GROUP_NAME }}"
